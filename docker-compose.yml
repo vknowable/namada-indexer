@@ -78,6 +78,15 @@ services:
         <<: *build-args
         PACKAGE: transactions
 
+  blocks:
+    <<: *defaults
+    image: namada/blocks-indexer
+    build:
+      <<: *build
+      args:
+        <<: *build-args
+        PACKAGE: blocks
+
   webserver:
     image: namada/webserver-indexer
     restart: on-failure

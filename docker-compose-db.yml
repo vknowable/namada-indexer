@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     command: -c 'max_connections=200'
     ports:
-      - 5435:5432
+      - 5547:5432
     environment:
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: housefire_nuclear
       POSTGRES_USER: postgres
       PGUSER: postgres
       POSTGRES_DB: namada-indexer

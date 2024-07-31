@@ -249,6 +249,22 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    blocks (id) {
+        #[max_length = 64]
+        id -> Varchar,
+        height -> Int4,
+        epoch -> Int4,
+        time -> Varchar,
+        #[max_length = 40]
+        proposer_address -> Varchar,
+        wrapper_txs -> Array<Varchar>,
+        inner_txs -> Array<Varchar>,
+        signatures -> Array<Varchar>,
+    }
+}
+
+
 diesel::joinable!(bonds -> validators (validator_id));
 diesel::joinable!(governance_votes -> governance_proposals (proposal_id));
 diesel::joinable!(inner_transactions -> wrapper_transactions (wrapper_id));
@@ -257,6 +273,7 @@ diesel::joinable!(unbonds -> validators (validator_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     balances,
+    blocks,
     bonds,
     chain_parameters,
     crawler_state,

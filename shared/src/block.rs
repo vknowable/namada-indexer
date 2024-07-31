@@ -145,6 +145,50 @@ impl Block {
         }
     }
 
+    // pub fn from_no_tx_decode(
+    //     block_response: TendermintBlockResponse,
+    //     epoch: Epoch,
+    //     block_height: BlockHeight,
+    // ) -> Self {
+    //     // let transactions = block_response
+    //     //     .block
+    //     //     .data
+    //     //     .iter()
+    //     //     .enumerate()
+    //     //     .filter_map(|(index, tx_raw_bytes)| {
+    //     //         Transaction::deserialize(
+    //     //             tx_raw_bytes,
+    //     //             index,
+    //     //             block_height,
+    //     //             checksums.clone(),
+    //     //             block_results,
+    //     //         )
+    //     //         .map_err(|reason| {
+    //     //             tracing::info!("Couldn't deserialize tx due to {}", reason);
+    //     //         })
+    //     //         .ok()
+    //     //     })
+    //     //     .collect::<Vec<(WrapperTransaction, Vec<InnerTransaction>)>>();
+
+    //     Block {
+    //         hash: Id::from(block_response.block_id.hash),
+    //         header: BlockHeader {
+    //             height: block_response.block.header.height.value()
+    //                 as BlockHeight,
+    //             proposer_address: block_response
+    //                 .block
+    //                 .header
+    //                 .proposer_address
+    //                 .to_string()
+    //                 .to_lowercase(),
+    //             timestamp: block_response.block.header.time.to_string(),
+    //             app_hash: Id::from(block_response.block.header.app_hash),
+    //         },
+    //         transactions: vec![],
+    //         epoch,
+    //     }
+    // }
+
     pub fn inner_txs(&self) -> Vec<InnerTransaction> {
         self.transactions
             .iter()
