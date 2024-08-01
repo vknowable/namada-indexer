@@ -39,8 +39,8 @@ impl BlockInsertDb {
             epoch: block.epoch as i32,
             time: block.header.timestamp,
             proposer_address: block.header.proposer_address,
-            wrapper_txs: inner_tx_hashes,
-            inner_txs: wrapper_tx_hashes,
+            wrapper_txs: wrapper_tx_hashes,
+            inner_txs: inner_tx_hashes,
             signatures: block.signatures,
         }
     }
