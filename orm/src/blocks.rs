@@ -1,6 +1,6 @@
 use diesel::{Insertable, Queryable, Selectable};
 use serde::Serialize;
-use shared::block::Block;
+use shared::block::BlockWithSignatures;
 
 use crate::schema::blocks;
 
@@ -22,7 +22,7 @@ pub struct BlockInsertDb {
 pub type BlocksDb = BlockInsertDb;
 
 impl BlockInsertDb {
-    pub fn from(block: Block) -> Self {
+    pub fn from(block: BlockWithSignatures) -> Self {
       let inner_tx_hashes: Vec<String> = block.inner_txs().iter()
         .map(
           |tx| tx.tx_id.clone().to_string()
@@ -41,7 +41,7 @@ impl BlockInsertDb {
             proposer_address: block.header.proposer_address,
             wrapper_txs: inner_tx_hashes,
             inner_txs: wrapper_tx_hashes,
-            signatures: vec![],
+            signatures: block.signatures,
         }
     }
 }

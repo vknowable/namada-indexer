@@ -6,11 +6,11 @@ use orm::crawler_state::{BlockStateInsertDb, CrawlerNameDb};
 use orm::schema::{crawler_state, blocks};
 use orm::blocks::BlockInsertDb;
 use shared::crawler_state::{BlockCrawlerState, CrawlerName};
-use shared::block::Block;
+use shared::block::BlockWithSignatures;
 
 pub fn insert_blocks(
     transaction_conn: &mut PgConnection,
-    blocks: Vec<Block>,
+    blocks: Vec<BlockWithSignatures>,
 ) -> anyhow::Result<()> {
     diesel::insert_into(blocks::table)
         .values::<&Vec<BlockInsertDb>>(

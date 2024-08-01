@@ -4,6 +4,7 @@ use std::str::FromStr;
 use namada_sdk::borsh::BorshDeserialize;
 use subtle_encoding::hex;
 use tendermint_rpc::endpoint::block::Response as TendermintBlockResponse;
+use tendermint::block::CommitSig;
 
 use crate::block_result::BlockResult;
 use crate::bond::BondAddresses;
@@ -144,50 +145,6 @@ impl Block {
             epoch,
         }
     }
-
-    // pub fn from_no_tx_decode(
-    //     block_response: TendermintBlockResponse,
-    //     epoch: Epoch,
-    //     block_height: BlockHeight,
-    // ) -> Self {
-    //     // let transactions = block_response
-    //     //     .block
-    //     //     .data
-    //     //     .iter()
-    //     //     .enumerate()
-    //     //     .filter_map(|(index, tx_raw_bytes)| {
-    //     //         Transaction::deserialize(
-    //     //             tx_raw_bytes,
-    //     //             index,
-    //     //             block_height,
-    //     //             checksums.clone(),
-    //     //             block_results,
-    //     //         )
-    //     //         .map_err(|reason| {
-    //     //             tracing::info!("Couldn't deserialize tx due to {}", reason);
-    //     //         })
-    //     //         .ok()
-    //     //     })
-    //     //     .collect::<Vec<(WrapperTransaction, Vec<InnerTransaction>)>>();
-
-    //     Block {
-    //         hash: Id::from(block_response.block_id.hash),
-    //         header: BlockHeader {
-    //             height: block_response.block.header.height.value()
-    //                 as BlockHeight,
-    //             proposer_address: block_response
-    //                 .block
-    //                 .header
-    //                 .proposer_address
-    //                 .to_string()
-    //                 .to_lowercase(),
-    //             timestamp: block_response.block.header.time.to_string(),
-    //             app_hash: Id::from(block_response.block.header.app_hash),
-    //         },
-    //         transactions: vec![],
-    //         epoch,
-    //     }
-    // }
 
     pub fn inner_txs(&self) -> Vec<InnerTransaction> {
         self.transactions
@@ -595,6 +552,92 @@ impl Block {
                 }
                 _ => None,
             })
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BlockWithSignatures {
+    pub hash: Id,
+    pub header: BlockHeader,
+    pub transactions: Vec<(WrapperTransaction, Vec<InnerTransaction>)>,
+    pub epoch: Epoch,
+    pub signatures: Vec<String>,
+}
+
+impl BlockWithSignatures {
+    pub fn from(
+        block_response: TendermintBlockResponse,
+        block_results: &BlockResult,
+        checksums: Checksums,
+        epoch: Epoch,
+        block_height: BlockHeight,
+    ) -> Self {
+        let transactions = block_response
+            .block
+            .data
+            .iter()
+            .enumerate()
+            .filter_map(|(index, tx_raw_bytes)| {
+                Transaction::deserialize(
+                    tx_raw_bytes,
+                    index,
+                    block_height,
+                    checksums.clone(),
+                    block_results,
+                )
+                .map_err(|reason| {
+                    tracing::info!("Couldn't deserialize tx due to {}", reason);
+                })
+                .ok()
+            })
+            .collect::<Vec<(WrapperTransaction, Vec<InnerTransaction>)>>();
+
+        let signatures = if let Some(last_commit) = block_response.block.last_commit() {
+            // map the Vec<CommitSig> to a Vec<String> of validator addresses
+            last_commit.signatures
+                .iter()
+                .filter_map(|commit_sig| match commit_sig {
+                    CommitSig::BlockIdFlagCommit { validator_address, .. } => Some(validator_address.to_string()),
+                    CommitSig::BlockIdFlagNil { validator_address, .. } => Some(validator_address.to_string()),
+                    CommitSig::BlockIdFlagAbsent => None,
+                })
+                .collect()
+        } else {
+            vec![]
+        };
+
+        BlockWithSignatures {
+            hash: Id::from(block_response.block_id.hash),
+            header: BlockHeader {
+                height: block_response.block.header.height.value()
+                    as BlockHeight,
+                proposer_address: block_response
+                    .block
+                    .header
+                    .proposer_address
+                    .to_string()
+                    .to_lowercase(),
+                timestamp: block_response.block.header.time.to_string(),
+                app_hash: Id::from(block_response.block.header.app_hash),
+            },
+            transactions,
+            epoch,
+            signatures,
+        }
+    }
+
+    pub fn inner_txs(&self) -> Vec<InnerTransaction> {
+        self.transactions
+            .iter()
+            .flat_map(|(_, inner_txs)| inner_txs.clone())
+            .collect()
+    }
+
+    pub fn wrapper_txs(&self) -> Vec<WrapperTransaction> {
+        self.transactions
+            .iter()
+            .map(|(wrapper_tx, _)| wrapper_tx.clone())
             .collect()
     }
 }

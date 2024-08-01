@@ -3,6 +3,7 @@ use namada_sdk::hash::Hash;
 use namada_sdk::queries::RPC;
 use namada_sdk::rpc;
 use namada_sdk::state::Key;
+use namada_sdk::storage::BlockHeight as SdkBlockHeight;
 use shared::block::{BlockHeight, Epoch};
 use shared::id::Id;
 use tendermint_rpc::HttpClient;
@@ -34,6 +35,18 @@ pub async fn get_current_epoch(client: &HttpClient) -> anyhow::Result<Epoch> {
     let epoch = rpc::query_epoch(client)
         .await
         .context("Failed to query Namada's current epoch")?;
+
+    Ok(epoch.0 as Epoch)
+}
+
+pub async fn get_epoch_at_height(client: &HttpClient, height: u64) -> anyhow::Result<Epoch> {
+    let epoch_query = rpc::query_epoch_at_height(client, SdkBlockHeight(height))
+        .await
+        .context(format!("Failed to query epoch at height {}", height))?;
+
+    let epoch = epoch_query.ok_or_else(|| {
+        anyhow::anyhow!("Failed to query epoch at height {}", height)
+    })?;
 
     Ok(epoch.0 as Epoch)
 }

@@ -7,7 +7,7 @@ use clap::Parser;
 use clap_verbosity_flag::LevelFilter;
 use deadpool_diesel::postgres::Object;
 use orm::migrations::run_migrations;
-use shared::block::Block;
+use shared::block::BlockWithSignatures;
 use shared::block_result::BlockResult;
 use shared::checksums::Checksums;
 use shared::crawler::crawl;
@@ -122,12 +122,14 @@ async fn crawling_fn(
         )
         .await
         .into_rpc_error()?;
+
     let block_results = BlockResult::from(tm_block_results_response);
 
-    //TODO find epoch
-    let block_epoch = 1;
+    let block_epoch = namada_service::get_epoch_at_height(&client, block_height as u64)
+        .await
+        .into_rpc_error()?;
 
-    let block = Block::from(
+    let block = BlockWithSignatures::from(
         tm_block_response.clone(),
         &block_results,
         checksums,
@@ -143,7 +145,7 @@ async fn crawling_fn(
         last_processed_block: block_height,
     };
 
-    let blocks: Vec<Block> = vec![block];
+    let blocks: Vec<BlockWithSignatures> = vec![block];
 
     conn.interact(move |conn| {
         conn.build_transaction()
