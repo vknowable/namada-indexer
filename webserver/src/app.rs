@@ -18,7 +18,7 @@ use tower_http::trace::TraceLayer;
 use crate::appstate::AppState;
 use crate::config::AppConfig;
 use crate::handler::{
-    balance as balance_handlers, chain as chain_handlers,
+    balance as balance_handlers, blocks as blocks_handlers, chain as chain_handlers,
     crawler_state as crawler_state_handlers, gas as gas_handlers,
     governance as gov_handlers, pk as pk_handlers, pos as pos_handlers,
     transaction as transaction_handlers,
@@ -128,6 +128,18 @@ impl ApplicationServer {
                 .route(
                     "/crawlers/timestamps",
                     get(crawler_state_handlers::get_crawlers_timestamps),
+                )
+                .route(
+                    "/blocks/height/:height",
+                    get(blocks_handlers::get_block_at_height),
+                )
+                .route(
+                    "/blocks/height/latest",
+                    get(blocks_handlers::get_block_at_latest),
+                )
+                .route(
+                    "/blocks/height/range",
+                    get(blocks_handlers::get_block_range),
                 )
                 .with_state(common_state)
         };

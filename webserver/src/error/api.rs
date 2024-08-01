@@ -2,6 +2,7 @@ use axum::response::{IntoResponse, Response};
 use thiserror::Error;
 
 use super::balance::BalanceError;
+use super::blocks::BlocksError;
 use super::chain::ChainError;
 use super::crawler_state::CrawlerStateError;
 use super::gas::GasError;
@@ -28,6 +29,8 @@ pub enum ApiError {
     GasError(#[from] GasError),
     #[error(transparent)]
     CrawlerStateError(#[from] CrawlerStateError),
+    #[error(transparent)]
+    BlocksError(#[from] BlocksError),
 }
 
 impl IntoResponse for ApiError {
@@ -41,6 +44,7 @@ impl IntoResponse for ApiError {
             ApiError::RevealedPkError(error) => error.into_response(),
             ApiError::GasError(error) => error.into_response(),
             ApiError::CrawlerStateError(error) => error.into_response(),
+            ApiError::BlocksError(error) => error.into_response(),
         }
     }
 }

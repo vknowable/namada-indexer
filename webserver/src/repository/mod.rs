@@ -1,4 +1,5 @@
 pub mod balance;
+pub mod blocks;
 pub mod chain;
 pub mod gas;
 pub mod governance;

@@ -78,34 +78,34 @@ services:
         <<: *build-args
         PACKAGE: transactions
 
-  # blocks:
-  #   <<: *defaults
-  #   image: namada/blocks-indexer
-  #   build:
-  #     <<: *build
-  #     args:
-  #       <<: *build-args
-  #       PACKAGE: blocks
-
-  webserver:
-    image: namada/webserver-indexer
-    restart: on-failure
-    depends_on:
-      - postgres
-      - dragonfly
+  blocks:
+    <<: *defaults
+    image: namada/blocks-indexer
     build:
-      context: .
-      dockerfile: Dockerfile
+      <<: *build
       args:
-        PACKAGE: webserver
-    command: "./service"
-    ports:
-      - ${WEBSERVER_PORT}:5000
-    environment:
-      <<: *env-vars
-    healthcheck:
-      test: curl --fail http://localhost:5000/health || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+        <<: *build-args
+        PACKAGE: blocks
+
+  # webserver:
+  #   image: namada/webserver-indexer
+  #   restart: on-failure
+  #   depends_on:
+  #     - postgres
+  #     - dragonfly
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     args:
+  #       PACKAGE: webserver
+  #   command: "./service"
+  #   ports:
+  #     - ${WEBSERVER_PORT}:5000
+  #   environment:
+  #     <<: *env-vars
+  #   healthcheck:
+  #     test: curl --fail http://localhost:5000/health || exit 1
+  #     interval: 15s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 10s
