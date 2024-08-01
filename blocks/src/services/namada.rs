@@ -21,37 +21,37 @@ pub async fn get_last_block(
         .map(|b| BlockHeight::from(b.height.0 as u32))
 }
 
-// pub async fn get_native_token(client: &HttpClient) -> anyhow::Result<Id> {
-//     let native_token = RPC
-//         .shell()
-//         .native_token(client)
-//         .await
-//         .context("Failed to query native token")?;
-//     Ok(Id::from(native_token))
-// }
+pub async fn get_native_token(client: &HttpClient) -> anyhow::Result<Id> {
+    let native_token = RPC
+        .shell()
+        .native_token(client)
+        .await
+        .context("Failed to query native token")?;
+    Ok(Id::from(native_token))
+}
 
-// pub async fn get_current_epoch(client: &HttpClient) -> anyhow::Result<Epoch> {
-//     let epoch = rpc::query_epoch(client)
-//         .await
-//         .context("Failed to query Namada's current epoch")?;
+pub async fn get_current_epoch(client: &HttpClient) -> anyhow::Result<Epoch> {
+    let epoch = rpc::query_epoch(client)
+        .await
+        .context("Failed to query Namada's current epoch")?;
 
-//     Ok(epoch.0 as Epoch)
-// }
+    Ok(epoch.0 as Epoch)
+}
 
-// pub async fn query_tx_code_hash(
-//     client: &HttpClient,
-//     tx_code_path: &str,
-// ) -> Option<String> {
-//     let hash_key = Key::wasm_hash(tx_code_path);
-//     let (tx_code_res, _) =
-//         rpc::query_storage_value_bytes(client, &hash_key, None, false)
-//             .await
-//             .ok()?;
-//     if let Some(tx_code_bytes) = tx_code_res {
-//         let tx_code =
-//             Hash::try_from(&tx_code_bytes[..]).expect("Invalid code hash");
-//         Some(tx_code.to_string())
-//     } else {
-//         None
-//     }
-// }
+pub async fn query_tx_code_hash(
+    client: &HttpClient,
+    tx_code_path: &str,
+) -> Option<String> {
+    let hash_key = Key::wasm_hash(tx_code_path);
+    let (tx_code_res, _) =
+        rpc::query_storage_value_bytes(client, &hash_key, None, false)
+            .await
+            .ok()?;
+    if let Some(tx_code_bytes) = tx_code_res {
+        let tx_code =
+            Hash::try_from(&tx_code_bytes[..]).expect("Invalid code hash");
+        Some(tx_code.to_string())
+    } else {
+        None
+    }
+}

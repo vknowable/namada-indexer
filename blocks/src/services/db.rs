@@ -13,7 +13,7 @@ pub async fn get_crawler_state(
     let crawler_state: BlockCrawlerStateDb = conn
         .interact(move |conn| {
             crawler_state::table
-                .filter(crawler_state::name.eq(CrawlerNameDb::Transactions))
+                .filter(crawler_state::name.eq(CrawlerNameDb::Blocks))
                 .select((
                     crawler_state::dsl::last_processed_block,
                     crawler_state::dsl::timestamp,

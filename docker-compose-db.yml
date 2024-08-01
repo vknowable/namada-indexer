@@ -5,7 +5,7 @@ services:
     ports:
       - 5547:5432
     environment:
-      POSTGRES_PASSWORD: housefire_nuclear
+      POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       PGUSER: postgres
       POSTGRES_DB: namada-indexer

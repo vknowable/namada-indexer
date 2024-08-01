@@ -1,6 +1,7 @@
 use crate::block::{BlockHeight, Epoch};
 
 pub enum CrawlerName {
+    Blocks,
     Chain,
     Governance,
     Parameters,

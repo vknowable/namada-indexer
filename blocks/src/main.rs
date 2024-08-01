@@ -7,9 +7,9 @@ use clap::Parser;
 use clap_verbosity_flag::LevelFilter;
 use deadpool_diesel::postgres::Object;
 use orm::migrations::run_migrations;
-use shared::block::TendermintBlock;
-// use shared::block_result::BlockResult;
-// use shared::checksums::Checksums;
+use shared::block::Block;
+use shared::block_result::BlockResult;
+use shared::checksums::Checksums;
 use shared::crawler::crawl;
 use shared::crawler_state::BlockCrawlerState;
 use shared::error::{AsDbError, AsRpcError, ContextDbInteractError, MainError};
@@ -125,21 +125,15 @@ async fn crawling_fn(
     let block_results = BlockResult::from(tm_block_results_response);
 
     //TODO find epoch
-    let block_epoch = 1
+    let block_epoch = 1;
 
-    let block = Block::from_no_tx_decode(
+    let block = Block::from(
         tm_block_response.clone(),
-        epoch,
+        &block_results,
+        checksums,
+        block_epoch,
         block_height,
     );
-
-    // let inner_txs = block.inner_txs();
-    // let wrapper_txs = block.wrapper_txs();
-
-    // tracing::info!(
-    //     "Deserialized {} txs...",
-    //     wrapper_txs.len() + inner_txs.len()
-    // );
 
     // Because blocks crawler starts from block 1 we read timestamp from
     // the block
@@ -149,20 +143,18 @@ async fn crawling_fn(
         last_processed_block: block_height,
     };
 
+    let blocks: Vec<Block> = vec![block];
+
     conn.interact(move |conn| {
-        conn.build_block()
+        conn.build_transaction()
             .read_write()
-            .run(|blocks_conn| {
-                blocks_repo::insert_block(
-                    blocks_conn,
-                    block,
+            .run(|transaction_conn| {
+                blocks_repo::insert_blocks(
+                    transaction_conn,
+                    blocks,
                 )?;
-                // transaction_repo::insert_inner_transactions(
-                //     blocks_conn,
-                //     inner_txs,
-                // )?;
                 blocks_repo::insert_crawler_state(
-                    blocks_conn,
+                    transaction_conn,
                     crawler_state,
                 )?;
 

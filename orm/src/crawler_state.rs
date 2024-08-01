@@ -14,6 +14,7 @@ use crate::schema::crawler_state;
 #[derive(Debug, Clone, Serialize, Deserialize, diesel_derive_enum::DbEnum)]
 #[ExistingTypePath = "crate::schema::sql_types::CrawlerName"]
 pub enum CrawlerNameDb {
+    Blocks,
     Chain,
     Governance,
     Parameters,
@@ -25,6 +26,7 @@ pub enum CrawlerNameDb {
 impl Display for CrawlerNameDb {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
+            Self::Blocks => f.write_str("block"),
             Self::Chain => f.write_str("chain"),
             Self::Governance => f.write_str("governance"),
             Self::Parameters => f.write_str("parameters"),
@@ -38,6 +40,7 @@ impl Display for CrawlerNameDb {
 impl From<CrawlerName> for CrawlerNameDb {
     fn from(value: CrawlerName) -> Self {
         match value {
+            CrawlerName::Blocks => Self::Blocks,
             CrawlerName::Chain => Self::Chain,
             CrawlerName::Governance => Self::Governance,
             CrawlerName::Parameters => Self::Parameters,

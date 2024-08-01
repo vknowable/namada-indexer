@@ -1,6 +1,6 @@
 -- Your SQL goes here
 
-CREATE TYPE CRAWLER_NAME AS ENUM ('chain', 'governance', 'parameters', 'pos', 'rewards', 'transactions');
+CREATE TYPE CRAWLER_NAME AS ENUM ('blocks', 'chain', 'governance', 'parameters', 'pos', 'rewards', 'transactions');
 
 CREATE TABLE crawler_state (
     name CRAWLER_NAME PRIMARY KEY NOT NULL,
