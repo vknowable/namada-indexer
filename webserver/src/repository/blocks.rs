@@ -1,7 +1,7 @@
 use axum::async_trait;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl,
-    SelectableHelper,
+    SelectableHelper, dsl::max,
 };
 use orm::blocks::BlocksDb;
 use orm::crawler_state::{CrawlerNameDb, BlockCrawlerStateDb};
@@ -28,6 +28,8 @@ pub trait BlocksRepositoryTrait {
         tip: i32,
         length: i32,
     ) -> Result<Vec<BlocksDb>, String>;
+
+    async fn get_latest_height(&self) -> Result<i32, String>;
 
     async fn get_state(&self) -> Result<BlockCrawlerStateDb, String>;
 }
@@ -74,6 +76,21 @@ impl BlocksRepositoryTrait for BlocksRepository {
         .await
         .map_err(|e| e.to_string())?
         .map_err(|e| e.to_string())
+    }
+
+    async fn get_latest_height(&self) -> Result<i32, String> {
+        let conn = self.app_state.get_db_connection().await;
+
+        conn.interact(move |conn| {
+            crawler_state::dsl::crawler_state
+                .filter(crawler_state::dsl::name.eq(CrawlerNameDb::Blocks))
+                .select(max(crawler_state::dsl::last_processed_block))
+                .first::<Option<i32>>(conn)
+        })
+        .await
+        .map_err(|e| e.to_string())?
+        .map_err(|e| e.to_string())
+        .and_then(|x| x.ok_or("No block processed".to_string()))
     }
 
     async fn get_state(&self) -> Result<BlockCrawlerStateDb, String> {

@@ -12,12 +12,14 @@ pub enum BlocksError {
     Unknown(String),
     #[error("Invalid range: {0}")]
     InvalidRange(String),
+    #[error("Invalid params: {0}")]
+    InvalidParams(String),
 }
 
 impl IntoResponse for BlocksError {
     fn into_response(self) -> Response {
         let status_code = match self {
-            BlocksError::Unknown(_) | BlocksError::Database(_) | BlocksError::InvalidRange(_) => {
+            BlocksError::Unknown(_) | BlocksError::Database(_) | BlocksError::InvalidRange(_) | BlocksError::InvalidParams(_)=> {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
         };

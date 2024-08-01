@@ -17,11 +17,11 @@ impl BlocksService {
 
     pub async fn get_block(
         &self,
-        height: u64,
+        height: i32,
     ) -> Result<Block, BlocksError> {
         let block = self
             .blocks_repo
-            .get_block(height as i32)
+            .get_block(height)
             .await
             .map_err(BlocksError::Database)?;
 
@@ -30,16 +30,25 @@ impl BlocksService {
 
     pub async fn get_block_range(
         &self,
-        tip: u64,
-        length: u64,
+        tip: i32,
+        length: i32,
     ) -> Result<Vec<Block>, BlocksError> {
         let blocks = self
             .blocks_repo
-            .get_block_range(tip as i32, length as i32)
+            .get_block_range(tip, length)
             .await
             .map_err(BlocksError::Database)?
             .into_iter().map(Block::from).collect();
 
         Ok(blocks)
+    }
+
+    pub async fn get_latest_height(
+        &self,
+    ) -> Result<i32, BlocksError> {
+        self.blocks_repo
+            .get_latest_height()
+            .await
+            .map_err(BlocksError::Database)
     }
 }
