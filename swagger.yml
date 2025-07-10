@@ -5,7 +5,7 @@ info:
   description: "Set of API to interact with a namada indexer."
   contact:
     email: hello@heliax.dev
-    url: https://github.com/anoma/namada-indexer
+    url: https://github.com/namada-net/namada-indexer
 servers:
   - url: http://localhost:5001
   - url: https://indexer.namada.tududes.com
