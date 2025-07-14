@@ -167,7 +167,7 @@ jobs:
           context: .
           file: Dockerfile
           build-args: PACKAGE=${{ matrix.docker.package }}
-          push: ${{ github.event.pull_request.head.repo.full_name == '${{ env.REPOSITORY }}' || github.event_name == 'push'  }}
+          push: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
