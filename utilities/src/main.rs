@@ -22,8 +22,6 @@ async fn main() -> anyhow::Result<()> {
         functions::fix::fix(&client).await?;
     } else if config.deserialize_tx && config.block_height.is_some() {
         let block_height = config.block_height.unwrap();
-        // functions::deserialize::deserialize_tx(&client, 2410415).await?;
-        // failing
         functions::deserialize_block::deserialize_tx(&client, block_height)
             .await?;
     } else if config.query_account && config.address.is_some() {
