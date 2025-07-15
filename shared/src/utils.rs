@@ -420,17 +420,28 @@ fn get_ibc_token(
     original_denom: &PrefixedDenom,
 ) -> anyhow::Result<(Address, crate::token::Token)> {
     if let Some(ibc_trace) = maybe_ibc_trace {
+        let is_native = original_denom
+            .to_string()
+            .contains(&native_token.to_string());
+
         let token_address =
             namada_ibc::trace::convert_to_address(ibc_trace.clone())
                 .expect("Failed to convert IBC trace to address");
 
-        Ok((
-            token_address.clone(),
-            crate::token::Token::Ibc(crate::token::IbcToken {
-                address: token_address.into(),
-                trace: Some(Id::IbcTrace(ibc_trace)),
-            }),
-        ))
+        if is_native {
+            Ok((
+                native_token.clone(),
+                crate::token::Token::Native(native_token.into()),
+            ))
+        } else {
+            Ok((
+                token_address.clone(),
+                crate::token::Token::Ibc(crate::token::IbcToken {
+                    address: token_address.into(),
+                    trace: Some(Id::IbcTrace(ibc_trace)),
+                }),
+            ))
+        }
     } else if !original_denom
         .to_string()
         .contains(&native_token.to_string())
