@@ -260,12 +260,9 @@ async fn add_balance(
         &NamadaSdkAddress::from(token_addr),
     );
 
-    let balances = query_storage_prefix::<token::Amount>(
-        client,
-        &balance_prefix,
-        Some(height),
-    )
-    .await?;
+    let balances =
+        query_storage_prefix::<token::Amount>(client, &balance_prefix, None)
+            .await?;
 
     if let Some(balances) = balances {
         for (key, balance) in balances {
