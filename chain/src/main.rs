@@ -29,6 +29,7 @@ use shared::block::Block;
 use shared::block_result::BlockResult;
 use shared::checksums::Checksums;
 use shared::client::Client;
+use shared::cometbft::CometbftBlock;
 use shared::crawler::crawl;
 use shared::crawler_state::ChainCrawlerState;
 use shared::error::{
@@ -277,8 +278,12 @@ async fn crawling_fn(
     let native_token_address: namada_sdk::address::Address =
         native_token.clone().into();
 
+    let cometbft_block =
+        get_cometbft_block_with_fallback(&conn, &client, block_height)
+            .await
+            .into_db_error()?;
     let (block, tm_block_response, epoch) =
-        get_block(block_height, &client, &checksums, &native_token_address)
+        get_block(cometbft_block, &client, &checksums, &native_token_address)
             .await?;
 
     let rate_limits = new_epoch.then(|| {
@@ -654,8 +659,14 @@ async fn try_initial_query(
             .await
             .into_rpc_error()?
             .into();
+
+    let cometbft_block =
+        get_cometbft_block_with_fallback(conn, client, block_height)
+            .await
+            .into_db_error()?;
+
     let (block, tm_block_response, epoch) =
-        get_block(block_height, client, &checksums, &native_token).await?;
+        get_block(cometbft_block, client, &checksums, &native_token).await?;
 
     let tokens = query_tokens(client).await.into_rpc_error()?;
 
@@ -846,36 +857,18 @@ async fn update_crawler_timestamp(
 }
 
 async fn get_block(
-    block_height: u32,
+    block: CometbftBlock,
     client: &HttpClient,
     checksums: &Checksums,
     native_token: &namada_sdk::address::Address,
 ) -> Result<(Block, TendermintBlockResponse, u32), MainError> {
-    tracing::debug!(block = block_height, "Query block...");
-    let tm_block_response =
-        tendermint_service::query_raw_block_at_height(client, block_height)
-            .await
-            .into_rpc_error()?;
-    tracing::debug!(
-        block = block_height,
-        "Raw block contains {} txs...",
-        tm_block_response.block.data.len()
-    );
+    let block_height = block.block_height;
 
-    tracing::debug!(block = block_height, "Query block results...");
-    let tm_block_results_response =
-        tendermint_service::query_raw_block_results_at_height(
-            client,
-            block_height,
-        )
-        .await
-        .into_rpc_error()?;
+    let tm_block_response = block.block;
+    let tm_block_results_response = block.events;
+    let epoch = block.epoch;
+
     let block_results = BlockResult::from(tm_block_results_response);
-
-    tracing::debug!(block = block_height, "Query epoch...");
-    let epoch = namada_service::get_epoch_at_block_height(client, block_height)
-        .await
-        .into_rpc_error()?;
 
     let proposer_address_namada = namada_service::get_validator_namada_address(
         client,
@@ -938,4 +931,47 @@ async fn query_token_supplies(
     }
 
     Ok(buffer)
+}
+
+pub async fn get_cometbft_block_with_fallback(
+    conn: &Object,
+    client: &HttpClient,
+    block_height: u32,
+) -> anyhow::Result<CometbftBlock> {
+    let block = repository::cometbft::get_block(conn, block_height)
+        .await
+        .context("Failed to get block")?;
+
+    let block = match block {
+        Some(block) => block,
+        None => {
+            let block = tendermint_service::query_raw_block_at_height(
+                client,
+                block_height,
+            )
+            .await
+            .context("Failed to query block")?;
+
+            let events = tendermint_service::query_raw_block_results_at_height(
+                client,
+                block_height,
+            )
+            .await
+            .context("Failed to query block results")?;
+
+            let epoch =
+                namada_service::get_epoch_at_block_height(client, block_height)
+                    .await
+                    .context("Failed to query epoch")?;
+
+            CometbftBlock {
+                block_height,
+                block,
+                events,
+                epoch,
+            }
+        }
+    };
+
+    Ok(block)
 }
