@@ -3,6 +3,7 @@ pub mod block;
 pub mod block_result;
 pub mod checksums;
 pub mod client;
+pub mod cometbft;
 pub mod crawler;
 pub mod crawler_state;
 pub mod error;

@@ -62,10 +62,10 @@ jobs:
             { image: governance, package: governance },
             { image: pos, package: pos },
             { image: rewards, package: rewards },
-            { image: seeder, package: seeder },
             { image: webserver, package: webserver },
             { image: parameters, package: parameters },
             { image: transactions, package: transactions },
+            { image: cometbft, package: cometbft },
           ]
 
     steps:
