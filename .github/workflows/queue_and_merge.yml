@@ -170,8 +170,8 @@ jobs:
           push: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha, scope=${{ matrix.docker.image }}, mode=max
+          cache-to: type=gha, scope=${{ matrix.docker.image }}, mode=max
 
   can_enqueue:
     needs: [clippy, format, docker, validate-swagger]
