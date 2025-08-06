@@ -91,8 +91,8 @@ jobs:
           push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: ${{ env.REGISTRY_URL }}/${{ env.REPOSITORY }}:${{ matrix.docker.image }}-${{ steps.get_version.outputs.version-without-v }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha, scope=${{ matrix.docker.image }}, mode=max
+          cache-to: type=gha, scope=${{ matrix.docker.image }}, mode=max
 
   swagger-npm-package:
     runs-on: ubuntu-latest
