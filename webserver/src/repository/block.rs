@@ -63,14 +63,17 @@ impl BlockRepositoryTrait for BlockRepository {
             .expect("Invalid timestamp")
             .naive_utc();
 
+        let lower_bound = timestamp - chrono::Duration::seconds(60);
+
         conn.interact(move |conn| {
             blocks::table
+                .filter(blocks::timestamp.ge(lower_bound))
                 .filter(blocks::timestamp.le(timestamp))
                 .order(blocks::timestamp.desc())
                 .select(BlockDb::as_select())
                 .first(conn)
                 .ok()
-        })
+            })
         .await
         .map_err(|e| e.to_string())
     }
