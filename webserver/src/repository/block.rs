@@ -73,7 +73,7 @@ impl BlockRepositoryTrait for BlockRepository {
                 .select(BlockDb::as_select())
                 .first(conn)
                 .ok()
-            })
+        })
         .await
         .map_err(|e| e.to_string())
     }
