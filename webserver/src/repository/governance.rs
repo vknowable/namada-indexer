@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::dsl::IntoBoxed;
 use diesel::pg::Pg;
 use diesel::{
@@ -18,6 +19,7 @@ pub struct GovernanceRepo {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait GovernanceRepoTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -59,6 +61,7 @@ pub trait GovernanceRepoTrait {
     ) -> Result<Vec<GovernanceProposalVoteDb>, String>;
 }
 
+#[async_trait]
 impl GovernanceRepoTrait for GovernanceRepo {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

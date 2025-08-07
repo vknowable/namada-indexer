@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::dsl::max;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension,
@@ -18,6 +19,7 @@ pub struct ChainRepository {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait ChainRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -40,6 +42,7 @@ pub trait ChainRepositoryTrait {
     ) -> Result<Option<TokenSuppliesDb>, String>;
 }
 
+#[async_trait]
 impl ChainRepositoryTrait for ChainRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

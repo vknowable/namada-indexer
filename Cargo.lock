@@ -8597,6 +8597,7 @@ name = "webserver"
 version = "3.3.4"
 dependencies = [
  "anyhow",
+ "async-trait",
  "axum",
  "axum-extra",
  "axum-macros",

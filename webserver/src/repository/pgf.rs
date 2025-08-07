@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::pgf::PublicGoodFundingPaymentDb;
 use orm::schema::public_good_funding;
@@ -10,6 +11,7 @@ pub struct PgfRepo {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait PgfRepoTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -24,6 +26,7 @@ pub trait PgfRepoTrait {
     ) -> Result<Option<PublicGoodFundingPaymentDb>, String>;
 }
 
+#[async_trait]
 impl PgfRepoTrait for PgfRepo {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::{
     ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
 };
@@ -16,6 +17,7 @@ pub struct TransactionRepository {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait TransactionRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -45,6 +47,7 @@ pub trait TransactionRepositoryTrait {
     ) -> Result<Vec<WrapperTransactionDb>, String>;
 }
 
+#[async_trait]
 impl TransactionRepositoryTrait for TransactionRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

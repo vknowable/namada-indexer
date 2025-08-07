@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::masp::MaspPoolDb;
 use orm::schema::masp_pool_aggregate;
@@ -9,6 +10,7 @@ pub struct MaspRepository {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait MaspRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -20,6 +22,7 @@ pub trait MaspRepositoryTrait {
     ) -> Result<Vec<MaspPoolDb>, String>;
 }
 
+#[async_trait]
 impl MaspRepositoryTrait for MaspRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

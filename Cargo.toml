@@ -24,6 +24,7 @@ readme = "README.md"
 version = "3.3.4"
 
 [workspace.dependencies]
+async-trait = "0.1.88"
 anyhow = "1.0.75"
 async-stream = "0.3.5"
 axum = { version = "0.8.4", features = ["tower-log", "http2"] }

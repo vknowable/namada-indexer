@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::balances::BalanceDb;
 use orm::schema::token;
@@ -11,6 +12,7 @@ pub struct BalanceRepo {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait BalanceRepoTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -22,6 +24,7 @@ pub trait BalanceRepoTrait {
     ) -> Result<Vec<BalanceDb>, String>;
 }
 
+#[async_trait]
 impl BalanceRepoTrait for BalanceRepo {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

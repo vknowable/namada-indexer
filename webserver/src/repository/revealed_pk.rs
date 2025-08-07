@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::revealed_pk::{RevealedPkDb, RevealedPkInsertDb};
 use orm::schema::revealed_pk;
@@ -9,6 +10,7 @@ pub struct RevealedPkRepo {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait PkRepoTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -23,6 +25,7 @@ pub trait PkRepoTrait {
     ) -> Result<(), String>;
 }
 
+#[async_trait]
 impl PkRepoTrait for RevealedPkRepo {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

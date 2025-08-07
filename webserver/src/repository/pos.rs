@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use bigdecimal::BigDecimal;
 use diesel::dsl::{sql, sum};
 use diesel::sql_types::Integer;
@@ -25,6 +26,7 @@ pub struct PosRepository {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait PosRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -115,6 +117,7 @@ pub trait PosRepositoryTrait {
     async fn get_state(&self) -> Result<EpochCrawlerStateDb, String>;
 }
 
+#[async_trait]
 impl PosRepositoryTrait for PosRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

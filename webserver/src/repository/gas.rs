@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use bigdecimal::BigDecimal;
 use diesel::dsl::{avg, count, max, min};
 use diesel::sql_types::{BigInt, Integer, Nullable, Numeric};
@@ -15,6 +16,7 @@ pub struct GasRepository {
     pub(crate) app_state: AppState,
 }
 
+#[async_trait]
 pub trait GasRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -47,6 +49,7 @@ pub trait GasRepositoryTrait {
     ) -> Result<(Option<i32>, Option<i32>, Option<BigDecimal>, i64), String>;
 }
 
+#[async_trait]
 impl GasRepositoryTrait for GasRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }
