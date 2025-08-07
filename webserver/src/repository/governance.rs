@@ -1,4 +1,4 @@
-use axum::async_trait;
+use async_trait::async_trait;
 use diesel::dsl::IntoBoxed;
 use diesel::pg::Pg;
 use diesel::{

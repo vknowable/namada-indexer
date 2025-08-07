@@ -1,4 +1,4 @@
-use axum::async_trait;
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::masp::MaspPoolDb;
 use orm::schema::masp_pool_aggregate;

@@ -1,4 +1,4 @@
-use axum::async_trait;
+use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::pgf::PublicGoodFundingPaymentDb;
 use orm::schema::public_good_funding;
