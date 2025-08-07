@@ -1,4 +1,3 @@
-use axum::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use orm::blocks::BlockDb;
 use orm::schema::blocks;
@@ -10,7 +9,6 @@ pub struct BlockRepository {
     pub(crate) app_state: AppState,
 }
 
-#[async_trait]
 pub trait BlockRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -30,7 +28,6 @@ pub trait BlockRepositoryTrait {
     ) -> Result<Option<BlockDb>, String>;
 }
 
-#[async_trait]
 impl BlockRepositoryTrait for BlockRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }

@@ -1,4 +1,3 @@
-use axum::async_trait;
 use bigdecimal::BigDecimal;
 use diesel::{
     ExpressionMethods, NullableExpressionMethods, QueryDsl, RunQueryDsl,
@@ -14,7 +13,6 @@ pub struct IbcRepository {
     pub(crate) app_state: AppState,
 }
 
-#[async_trait]
 pub trait IbcRepositoryTrait {
     fn new(app_state: AppState) -> Self;
 
@@ -40,7 +38,6 @@ pub trait IbcRepositoryTrait {
     ) -> Result<(String, String), String>;
 }
 
-#[async_trait]
 impl IbcRepositoryTrait for IbcRepository {
     fn new(app_state: AppState) -> Self {
         Self { app_state }
