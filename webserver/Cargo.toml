@@ -48,6 +48,7 @@ tower-http.workspace = true
 tracing.workspace = true
 validator.workspace = true
 async-trait.workspace = true
+mimalloc.workspace = true
 
 [build-dependencies]
 vergen = { workspace = true, features = ["build", "git", "gitcl"] }
